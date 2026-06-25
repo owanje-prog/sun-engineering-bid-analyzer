@@ -10,7 +10,7 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "입찰 공고 분석기",
+  title: "선엔지니어링 입찰공고 분석기",
   description: "나라장터 입찰 공고 PDF 분석 도구 — 선엔지니어링 수주전략팀",
 };
 
@@ -26,7 +26,7 @@ export default function RootLayout({
           <Sidebar />
           <div className="flex flex-col flex-1 min-w-0 h-full">
             <header className="h-12 shrink-0 bg-white border-b border-gray-100 flex items-center px-5 gap-3">
-              <span className="text-sm font-medium text-gray-800">입찰 공고 분석기</span>
+              <span className="text-sm font-medium text-gray-800">입찰공고 분석기</span>
               <span className="text-xs bg-amber-50 text-amber-600 border border-amber-100 rounded-full px-2.5 py-0.5">
                 ⚠ 원문 확인 필요
               </span>
