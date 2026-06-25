@@ -1,8 +1,8 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { ChecklistItem, EngineerCareer, NoticeData, NoticeStore, ProjectRecord } from '@/types/notice';
-import { loadStore, saveStore } from '@/lib/storage';
+import { loadStore, upsertNotice, deleteNoticeFromDb } from '@/lib/storage';
 
 interface NoticeStoreContext {
   notices: NoticeData[];
@@ -25,44 +25,30 @@ export function useNoticeStore(): NoticeStoreContext {
 
 export function useNoticeStoreProvider() {
   const [store, setStore] = useState<NoticeStore>({ notices: [] });
-  const [storageWarning, setStorageWarning] = useState(false);
-  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const storageWarning = false;
 
   useEffect(() => {
-    setStore(loadStore());
-  }, []);
-
-  const persist = useCallback((next: NoticeStore) => {
-    if (saveTimer.current) clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => {
-      const { overLimit } = saveStore(next);
-      setStorageWarning(overLimit);
-    }, 500);
+    loadStore().then(setStore);
   }, []);
 
   const addNotice = useCallback((notice: NoticeData) => {
-    setStore(prev => {
-      const next = { notices: [notice, ...prev.notices] };
-      persist(next);
-      return next;
-    });
-  }, [persist]);
+    setStore(prev => ({ notices: [notice, ...prev.notices] }));
+    upsertNotice(notice);
+  }, []);
 
   const updateNotice = useCallback((id: string, patch: Partial<NoticeData>) => {
     setStore(prev => {
-      const next = { notices: prev.notices.map(n => n.id === id ? { ...n, ...patch } : n) };
-      persist(next);
-      return next;
+      const next = prev.notices.map(n => n.id === id ? { ...n, ...patch } : n);
+      const updated = next.find(n => n.id === id);
+      if (updated) upsertNotice(updated);
+      return { notices: next };
     });
-  }, [persist]);
+  }, []);
 
   const deleteNotice = useCallback((id: string) => {
-    setStore(prev => {
-      const next = { notices: prev.notices.filter(n => n.id !== id) };
-      persist(next);
-      return next;
-    });
-  }, [persist]);
+    setStore(prev => ({ notices: prev.notices.filter(n => n.id !== id) }));
+    deleteNoticeFromDb(id);
+  }, []);
 
   const updateChecklist = useCallback((id: string, items: ChecklistItem[]) => {
     updateNotice(id, { checklist: items });
