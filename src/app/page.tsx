@@ -1,11 +1,12 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import { Upload } from 'lucide-react';
+import { Upload, Search } from 'lucide-react';
 import KpiCards from '@/components/dashboard/KpiCards';
 import NoticeTable from '@/components/dashboard/NoticeTable';
 import ChecklistPreview from '@/components/dashboard/ChecklistPreview';
 import ComparePanel from '@/components/dashboard/ComparePanel';
+import NaraSearchModal from '@/components/search/NaraSearchModal';
 import { useNoticeStore } from '@/hooks/useNoticeStore';
 import { extractTextFromPdf } from '@/lib/pdf-extractor';
 import { parseNotice } from '@/lib/notice-parser';
@@ -23,6 +24,7 @@ export default function HomePage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [legacyNotices, setLegacyNotices] = useState<NoticeData[]>([]);
   const [migrating, setMigrating] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -122,15 +124,31 @@ export default function HomePage() {
           <p className="text-xs text-gray-400">
             {notices.length > 0 ? `${notices.length}개 공고 관리 중` : '공고를 업로드하세요'}
           </p>
-          <button
-            onClick={() => inputRef.current?.click()}
-            disabled={loading}
-            className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-gray-200 rounded-lg bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
-          >
-            <Upload size={13} />
-            {loading ? '처리 중...' : 'PDF 업로드'}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-gray-200 rounded-lg bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+            >
+              <Search size={13} />
+              공고 검색
+            </button>
+            <button
+              onClick={() => inputRef.current?.click()}
+              disabled={loading}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-gray-200 rounded-lg bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            >
+              <Upload size={13} />
+              {loading ? '처리 중...' : 'PDF 업로드'}
+            </button>
+          </div>
         </div>
+
+        {searchOpen && (
+          <NaraSearchModal
+            onClose={() => setSearchOpen(false)}
+            onImport={(notice) => { addNotice(notice); setFocusedId(notice.id); }}
+          />
+        )}
 
         <KpiCards notices={notices} />
 
