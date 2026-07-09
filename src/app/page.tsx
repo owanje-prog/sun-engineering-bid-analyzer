@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Upload } from 'lucide-react';
 import KpiCards from '@/components/dashboard/KpiCards';
 import NoticeTable from '@/components/dashboard/NoticeTable';
@@ -10,6 +10,10 @@ import { useNoticeStore } from '@/hooks/useNoticeStore';
 import { extractTextFromPdf } from '@/lib/pdf-extractor';
 import { parseNotice } from '@/lib/notice-parser';
 import { generateId } from '@/lib/utils';
+import { upsertNotice } from '@/lib/storage';
+import type { NoticeData } from '@/types/notice';
+
+const LS_KEY = 'bid-analyzer-store';
 
 export default function HomePage() {
   const { notices, addNotice, deleteNotice, storageWarning } = useNoticeStore();
@@ -17,6 +21,31 @@ export default function HomePage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [legacyNotices, setLegacyNotices] = useState<NoticeData[]>([]);
+  const [migrating, setMigrating] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as { notices: NoticeData[] };
+      if (parsed.notices?.length > 0) setLegacyNotices(parsed.notices);
+    } catch {}
+  }, []);
+
+  async function handleMigrate() {
+    setMigrating(true);
+    try {
+      for (const notice of legacyNotices) {
+        await upsertNotice(notice);
+        addNotice(notice);
+      }
+      localStorage.removeItem(LS_KEY);
+      setLegacyNotices([]);
+    } finally {
+      setMigrating(false);
+    }
+  }
 
   async function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
@@ -62,6 +91,26 @@ export default function HomePage() {
       />
 
       <div className="flex flex-col gap-4 h-full">
+        {legacyNotices.length > 0 && (
+          <div className="flex items-center justify-between bg-blue-50 border border-blue-200 text-blue-700 text-xs rounded-lg px-4 py-2 gap-3">
+            <span>이전에 저장된 공고 {legacyNotices.length}건이 브라우저에 남아 있습니다. 데이터베이스로 복구하시겠습니까?</span>
+            <div className="flex gap-2 shrink-0">
+              <button
+                onClick={() => { localStorage.removeItem(LS_KEY); setLegacyNotices([]); }}
+                className="px-2 py-1 rounded border border-blue-300 bg-white hover:bg-blue-50"
+              >
+                무시
+              </button>
+              <button
+                onClick={handleMigrate}
+                disabled={migrating}
+                className="px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+              >
+                {migrating ? '복구 중...' : '복구하기'}
+              </button>
+            </div>
+          </div>
+        )}
         {storageWarning && (
           <div className="bg-red-50 border border-red-200 text-red-600 text-xs rounded-lg px-4 py-2">
             저장 용량이 5MB에 근접했습니다. 오래된 공고를 삭제해 주세요.
