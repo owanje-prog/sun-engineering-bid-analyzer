@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { Search, X, Download } from 'lucide-react';
 import type { NaraBidItem, NoticeCategory } from '@/lib/nara-api';
+
+// 나라장터 API 조회 기간 제한(서버의 nara-api.ts MAX_RANGE_DAYS와 동일하게 유지)
+const MAX_RANGE_DAYS = 30;
 import type { NoticeData } from '@/types/notice';
 import { generateId } from '@/lib/utils';
 
@@ -47,6 +50,12 @@ export default function NaraSearchModal({ onClose, onImport }: Props) {
   const [importedIds, setImportedIds] = useState<string[]>([]);
 
   async function handleSearch() {
+    const days = Math.round((new Date(toDate).getTime() - new Date(fromDate).getTime()) / (1000 * 60 * 60 * 24));
+    if (days > MAX_RANGE_DAYS - 1) {
+      setError(`조회 기간은 최대 ${MAX_RANGE_DAYS}일까지 가능합니다. 기간을 좁혀서 다시 검색해 주세요.`);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
@@ -152,6 +161,7 @@ export default function NaraSearchModal({ onClose, onImport }: Props) {
               {loading ? '검색 중...' : '검색'}
             </button>
           </div>
+          <p className="text-xs text-gray-400">조회 기간은 최대 {MAX_RANGE_DAYS}일까지 검색할 수 있어요.</p>
           {error && <p className="text-xs text-red-500">{error}</p>}
         </div>
 
