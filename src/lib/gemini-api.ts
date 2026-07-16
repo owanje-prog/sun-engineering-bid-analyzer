@@ -2,7 +2,7 @@
 // API 키는 GEMINI_API_KEY 환경변수로만 읽으며, 이 파일은 API 라우트(서버)에서만 import한다.
 // 절대 클라이언트 컴포넌트에서 import하지 말 것 — 키가 번들에 포함될 수 있다.
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL ?? 'gemini-2.5-flash';
+const GEMINI_MODEL = process.env.GEMINI_MODEL ?? 'gemini-3.1-flash-lite';
 const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 // 공고 원문이 아무리 길어도 프롬프트에는 이 길이까지만 넣는다(과금·응답지연 방지).
