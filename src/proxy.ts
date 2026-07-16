@@ -73,8 +73,8 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // 정적 파일·이미지·PDF 워커 등은 제외하고 페이지 요청에만 적용
+  // 정적 파일·이미지·PDF 워커·robots.txt 등은 제외하고 페이지 요청에만 적용
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|js|mjs|css|map|woff|woff2)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|js|mjs|css|map|woff|woff2)$).*)',
   ],
 };

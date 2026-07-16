@@ -14,6 +14,13 @@ const geistSans = Geist({
 export const metadata: Metadata = {
   title: "선엔지니어링 입찰공고 분석기",
   description: "나라장터 입찰 공고 PDF 분석 도구 — 선엔지니어링 수주전략팀",
+  // 사내 전용 도구 — 검색엔진·AI 크롤러 색인 차단
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: { index: false, follow: false },
+  },
 };
 
 // proxy.ts와 동일한 개발용 로그인 생략 스위치 (.env.local의 SKIP_AUTH=true)
