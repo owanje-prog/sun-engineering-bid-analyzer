@@ -6,6 +6,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useNoticeStore } from '@/hooks/useNoticeStore';
 import DDayBadge from '@/components/notices/DDayBadge';
 import ExtractedFields from '@/components/detail/ExtractedFields';
+import SummaryCard from '@/components/detail/SummaryCard';
 import TabNav from '@/components/detail/TabNav';
 import Checklist from '@/components/detail/checklist/Checklist';
 import ProjectRecordForm from '@/components/detail/forms/ProjectRecordForm';
@@ -62,6 +63,8 @@ export default function NoticePage({ params }: { params: Promise<{ id: string }>
         <h2 className="text-sm font-semibold text-gray-700 mb-4">공고 정보</h2>
         <ExtractedFields notice={notice} onUpdate={handleFieldUpdate} />
       </div>
+
+      <SummaryCard notice={notice} />
 
       {/* 탭 */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
