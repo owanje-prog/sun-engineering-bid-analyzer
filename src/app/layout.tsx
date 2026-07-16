@@ -16,15 +16,24 @@ export const metadata: Metadata = {
   description: "나라장터 입찰 공고 PDF 분석 도구 — 선엔지니어링 수주전략팀",
 };
 
+// proxy.ts와 동일한 개발용 로그인 생략 스위치 (.env.local의 SKIP_AUTH=true)
+const SKIP_AUTH =
+  process.env.NODE_ENV !== 'production' && process.env.SKIP_AUTH === 'true';
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user: { email?: string } | null = null;
+
+  if (SKIP_AUTH) {
+    user = { email: '개발용(로그인 생략)' };
+  } else {
+    const supabase = await createSupabaseServerClient();
+    const result = await supabase.auth.getUser();
+    user = result.data.user;
+  }
 
   return (
     <html lang="ko" className={`${geistSans.variable} h-full antialiased`}>

@@ -14,7 +14,17 @@ function isPublic(pathname: string): boolean {
   );
 }
 
+// 개발 중 로그인 없이 작업하고 싶을 때 .env.local에 SKIP_AUTH=true 추가하면
+// 이 로그인 검사를 통째로 건너뛴다. 배포 환경(production)에서는 절대 동작하지 않도록
+// NODE_ENV까지 함께 확인한다.
+const SKIP_AUTH =
+  process.env.NODE_ENV !== 'production' && process.env.SKIP_AUTH === 'true';
+
 export async function proxy(request: NextRequest) {
+  if (SKIP_AUTH) {
+    return NextResponse.next({ request });
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
