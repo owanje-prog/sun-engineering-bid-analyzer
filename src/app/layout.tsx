@@ -64,7 +64,7 @@ export default async function RootLayout({
           </StoreProvider>
         ) : (
           // 미로그인 상태: 로그인 페이지만 깔끔히 표시
-          <div className="flex-1 min-w-0 h-full">{children}</div>
+          <main className="flex-1 min-w-0 h-full">{children}</main>
         )}
       </body>
     </html>

@@ -74,7 +74,7 @@ export default function LoginPage() {
 
   const tabBtn = (active: boolean) =>
     `flex-1 text-xs py-2 rounded-md transition-colors ${
-      active ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+      active ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-600 hover:text-gray-700'
     }`;
 
   return (
@@ -82,7 +82,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
           <h1 className="text-lg font-semibold text-gray-800">입찰공고 분석기</h1>
-          <p className="text-xs text-gray-400 mt-1">선엔지니어링 수주전략팀</p>
+          <p className="text-xs text-gray-500 mt-1">선엔지니어링 수주전략팀</p>
         </div>
 
         <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5">
@@ -147,7 +147,7 @@ export default function LoginPage() {
               >
                 {loading ? '발송 중...' : '로그인 링크 받기'}
               </button>
-              <p className="text-xs text-gray-400 text-center">
+              <p className="text-xs text-gray-500 text-center">
                 비밀번호 없이 이메일로 받은 링크를 눌러 로그인합니다.
               </p>
             </form>
